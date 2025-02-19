@@ -1,37 +1,241 @@
 const mongoose = require("mongoose");
-const { v4 } = require("uuid");
 
-const userSchema = new mongoose.Schema(
+const customerSchema = new mongoose.Schema(
   {
-    _id: {
-      type: String,
-      default: v4,
+    personalInfo: {
+      fullName:
+      {
+        type: String,
+        required: true
+      },
+      dateOfBirth:
+      {
+        type: Date,
+        required: true
+      },
+      gender: {
+        type: String,
+        enum: ["Male", "Female", "Other"],
+        required: true,
+      },
+      maritalStatus: {
+        type: String,
+        enum: ["Single", "Married", "Divorced", "Widowed"],
+      },
+      contactNumber:
+      {
+        type: String,
+        required: true
+      },
+      alternateNumber:
+      {
+        type: String
+      },
+      email:
+      {
+        type: String,
+        required: true, unique: true
+      },
+      address: {
+        current: { type: String, required: true },
+        permanent: { type: String },
+      },
+      governmentID: {
+        type: {
+          type: String,
+          enum: ["Aadhaar", "PAN", "Passport", "Voter ID"],
+          required: true,
+        },
+        number: { type: String, required: true, unique: true },
+      },
     },
-    name: {
-      type: String,
-      trim: true,
-      required: true,
+    financialDetails: {
+      occupation: {
+        type: String,
+        enum: ["Salaried", "Self-Employed", "Business"],
+        required: true,
+      },
+      employerName: {
+        type: String,
+        required: function () {
+          return this.financialDetails.occupation === "Salaried";
+        },
+      },
+      employerAddress: {
+        type: String,
+        required: function () {
+          return this.financialDetails.occupation === "Salaried";
+        },
+      },
+      monthlyIncome: {
+        type: Number,
+        required: true
+      },
+      annualIncome:
+      {
+        type: Number 
+          
+        },
+      incomeProof:
+      {
+        type: String 
+          
+        }, 
+      businessRegistration: {
+        type: String,
+        required: function () {
+          return this.financialDetails.occupation === "Business";
+        },
+      },
+      financialStatements: {
+        type: String,
+        required: function () {
+          return this.financialDetails.occupation === "Business";
+        },
+      }, 
     },
-    email: {
-      type: String,
-      required: true,
+    loanDetails: {
+      existingLoans: [
+        {
+          loanType: {
+            type: String,
+            enum: ["Personal", "Home", "Business", "Auto", "Gold", "Other"],
+          },
+          loanAmount:
+          {
+            type: Number
+          },
+          loanTenure:
+          {
+            type: Number
+          }, 
+          interestRate:
+          {
+            type: Number
+          },
+          emiAmount:
+          {
+            type: Number
+          }, 
+        },
+      ],
+      requiredLoan: {
+        loanType: {
+          type: String,
+          enum: ["Personal", "Home", "Business", "Auto", "Gold", "Other"],
+          required: true,
+        },
+        amountRequired:
+        {
+          type: Number,
+          required: true
+        },
+        tenure:
+        {
+          type: Number,
+          required: true
+        },
+        purpose:
+        {
+          type: String,
+          required: true
+        },
+      },
+      creditScore:
+      {
+        type: Number
+      },
     },
-    phonenumber: {
-      type: String,
-      required: true,
+    assets: {
+      property: {
+        address: {
+          type: String,
+          required: function () {
+            return this.assets.property.estimatedValue > 0;
+          },
+        },
+        estimatedValue: { type: Number },
+      },
+      vehicle: {
+        model: {
+          type: String,
+          required: function () {
+            return this.assets.vehicle.registrationNumber;
+          },
+        },
+        registrationNumber:
+        {
+          type: String
+        },
+      },
+      gold: {
+        weightInGrams:
+        {
+          type: Number
+        },
+        estimatedValue:
+        {
+          type: Number
+        },
+      },
     },
-    password: {
-      type: String,
-      required: true,
+    bankDetails: {
+      accountNumber:
+      {
+        type: String,
+        required: true
+      },
+      bankName:
+      {
+        type: String,
+        required: true
+      },
+      branch:
+      {
+        type: String
+      },
+      ifscCode:
+      {
+        type: String,
+        required: true
+      },
+      transactionHistory:
+      {
+        type: String
+      }, 
     },
-    active: {
-      type: Boolean,
-      default: true,
+    references: [
+      {
+        name:
+        {
+          type: String,
+          required: true
+        },
+        relationship:
+        {
+          type: String
+        },
+        contactNumber:
+        {
+          type: String,
+          required: true
+        },
+      },
+    ],
+    nominee: {
+      name:
+      {
+        type: String,
+        required: true
+      },
+      relationship:
+      {
+        type: String,
+        required: true
+      },
     },
   },
   { timestamps: true }
 );
-const User = mongoose.model("users", userSchema);
-module.exports = {
-  User,
-};
+
+module.exports = mongoose.model("Customer", customerSchema);
