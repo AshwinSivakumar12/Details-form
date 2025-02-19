@@ -46,8 +46,16 @@ const customerSchema = new mongoose.Schema(
           enum: ["Aadhaar", "PAN", "Passport", "Voter ID"],
           required: true,
         },
-        number: { type: String, required: true, unique: true },
+        number: {
+          type: String,
+          required: true,
+          unique: true
+        },
       },
+      Photo: {
+        type: String,
+        required:true
+      }
     },
     financialDetails: {
       occupation: {
@@ -184,6 +192,10 @@ const customerSchema = new mongoose.Schema(
       {
         type: String,
         required: true
+      },
+      panCard: {
+        type: String,
+        required:true
       },
       bankName:
       {
